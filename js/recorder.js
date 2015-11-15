@@ -1,22 +1,24 @@
 (function(window) {
 
-  var recordWavWorker = new Worker('js/enc/wav/recorderWorker.js');
-  var encoderMp3Worker = new Worker('js/enc/mp3/mp3Worker.js');
+  var BUFFER_LEN = 4096;
+  var WAV_CALLBACK = function(b){};
+  var MP3_CALLBACK = function(b){};
+  var WAV_WORKER_PATH = 'js/enc/wav/recorderWorker.js';
+  var MP3_WORKER_PATH = 'js/enc/mp3/mp3Worker.js';
 
-  var Recorder = function(source) {
-
-    var bufferLen = 4096;
+  var Recorder = function(source, config) {
     var recording = false;
+    var bufferLen = config.bufferLen || BUFFER_LEN;
+    var wavCallback = config.wavCallback || WAV_CALLBACK;
+    var mp3Callback = config.mp3Callback || MP3_CALLBACK;
 
     this.context = source.context;
 
-    /*
-      ScriptProcessorNode createScriptProcessor (optional unsigned long bufferSize = 0,
-       optional unsigned long numberOfInputChannels = 2, optional unsigned long numberOfOutputChannels = 2 );
-    */
-
     this.node = (this.context.createScriptProcessor || this.context.createJavaScriptNode).call(this.context, bufferLen, 1, 1);
     this.node.connect(this.context.destination); //this should not be necessary
+
+    var recordWavWorker = new Worker(config.wavWorkerPath || WAV_WORKER_PATH);
+    var encoderMp3Worker = new Worker(config.wavWorkerPath || MP3_WORKER_PATH);
 
     this.node.onaudioprocess = function(e) {
 
@@ -42,7 +44,6 @@
     source.connect(this.node);
 
     this.record = function() {
-
       if (recording)
         return false;
 
@@ -51,7 +52,6 @@
       var sampleRate = this.context.sampleRate;
 
       console.log("Initializing WAV");
-      log.innerHTML += "\n" + "Creating Empty WAV";
 
       recordWavWorker.postMessage({
         command: 'init',
@@ -61,7 +61,6 @@
       });
 
       console.log("Initializing to Mp3");
-      log.innerHTML += "\n" + "Creating Empty Mp3:" + sampleRate;
 
       encoderMp3Worker.postMessage({
         command: 'init',
@@ -77,7 +76,6 @@
     }
 
     this.stop = function() {
-
       if (!recording)
         return;
 
@@ -90,11 +88,9 @@
       });
 
       recording = false;
-
     }
 
     encoderMp3Worker.onmessage = function(e) {
-
       var command = e.data.command;
 
       console.log('encoderMp3Worker - onmessage: ' + command);
@@ -103,87 +99,31 @@
         case 'data':
           var buf = e.data.buf;
           console.log('Receiving data from mp3-Encoder');
-
-          //maybe you want to send to websocket channel, as:
-          //https://github.com/akrennmair/speech-to-server
-
           break;
+
         case 'mp3':
-          var buf = e.data.buf;
-          endFile(buf, 'mp3');
-          // Removed the terminate of the worker - terminate does not allow multiple recordings
-          //encoderMp3Worker.terminate();
-          //encoderMp3Worker = null;
+          var blob = e.data;
+          mp3Callback(blob);
           break;
       }
 
     };
 
     recordWavWorker.onmessage = function(e) {
-
       var command = e.data.command;
 
       console.log('recordWavWorker - onmessage: ' + command);
 
       switch (command) {
         case 'wav':
-          endFile(e.data.buf, 'wav');
+          var blob = e.data;
+          wavCallback(blob);
           break;
       }
 
     };
-
-    function endFile(blob, extension) {
-
-      console.log("Done converting to " + extension);
-      log.innerHTML += "\n" + "Done converting to " + extension;
-
-      console.log("the blob " + blob + " " + blob.size + " " + blob.type);
-
-      var url = URL.createObjectURL(blob);
-      var li = document.createElement('li');
-      var hf = document.createElement('a');
-      hf.href = url;
-      hf.download = new Date().toISOString() + '.' + extension;
-      hf.innerHTML = hf.download;
-      li.appendChild(hf);
-
-      var au = document.createElement('audio');
-      au.controls = true;
-      au.src = url;
-      li.appendChild(au);
-
-      // Upload file to server - uncomment below
-      // uploadAudio(blob);
-      // console.log("File uploaded");
-      // log.innerHTML += "\n" + "File uploaded";
-
-      recordingslist.appendChild(li);
-
-    }
-
   };
-	function uploadAudio(mp3Data){
-		var reader = new FileReader();
-		reader.onload = function(event){
-			var fd = new FormData();
-			var mp3Name = encodeURIComponent('audio_recording_' + new Date().getTime() + '.mp3');
-			console.log("mp3name = " + mp3Name);
-			fd.append('fname', mp3Name);
-			fd.append('data', event.target.result);
-			$.ajax({
-				type: 'POST',
-				url: 'upload.php',
-				data: fd,
-				processData: false,
-				contentType: false
-			}).done(function(data) {
-				console.log('Upload.php');
-			});
-		};      
-		reader.readAsDataURL(mp3Data);
-	}
-	
+
   window.Recorder = Recorder;
 
 })(window);
