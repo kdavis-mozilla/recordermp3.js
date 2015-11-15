@@ -102,7 +102,7 @@
           break;
 
         case 'mp3':
-          var blob = e.data;
+          var blob = e.data.buf;
           mp3Callback(blob);
           break;
       }
@@ -116,7 +116,7 @@
 
       switch (command) {
         case 'wav':
-          var blob = e.data;
+          var blob = e.data.buf;
           wavCallback(blob);
           break;
       }
