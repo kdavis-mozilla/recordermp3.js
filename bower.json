@@ -1,0 +1,23 @@
+{
+  "name": "recordermp3.js",
+  "homepage": "https://github.com/kdavis-mozilla/recordermp3.js",
+  "authors": [
+    "Wellington Soares <well.cco@gmail.com>"
+  ],
+  "description": "Records mp3 audio in the browser",
+  "main": "js/recorder.js",
+  "moduleType": [],
+  "keywords": [
+    "audio",
+    "record",
+    "mp3"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
