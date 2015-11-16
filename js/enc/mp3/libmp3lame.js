@@ -3822,7 +3822,6 @@ var _llvm_va_start; // stub for _llvm_va_start
             'wav': 'audio/wav',
             'mp3': 'audio/mpeg'
           }[name.substr(-3)];
-          return ret;
         }
   
         if (!Module["preloadPlugins"]) Module["preloadPlugins"] = [];
