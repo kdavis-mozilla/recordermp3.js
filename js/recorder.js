@@ -1,15 +1,12 @@
 (function(window) {
 
   var BUFFER_LEN = 4096;
-  var WAV_CALLBACK = function(b){};
   var MP3_CALLBACK = function(b){};
-  var WAV_WORKER_PATH = 'js/enc/wav/recorderWorker.js';
   var MP3_WORKER_PATH = 'js/enc/mp3/mp3Worker.js';
 
   var Recorder = function(source, config) {
     var recording = false;
     var bufferLen = config.bufferLen || BUFFER_LEN;
-    var wavCallback = config.wavCallback || WAV_CALLBACK;
     var mp3Callback = config.mp3Callback || MP3_CALLBACK;
 
     this.context = source.context;
@@ -17,7 +14,6 @@
     this.node = (this.context.createScriptProcessor || this.context.createJavaScriptNode).call(this.context, bufferLen, 1, 1);
     this.node.connect(this.context.destination); //this should not be necessary
 
-    var recordWavWorker = new Worker(config.wavWorkerPath || WAV_WORKER_PATH);
     var encoderMp3Worker = new Worker(config.mp3WorkerPath || MP3_WORKER_PATH);
 
     this.node.onaudioprocess = function(e) {
@@ -34,11 +30,6 @@
         buf: channelLeft
       });
 
-      recordWavWorker.postMessage({
-        command: 'record',
-        buffer: channelLeft
-      });
-
     }
 
     source.connect(this.node);
@@ -50,15 +41,6 @@
       recording = true;
 
       var sampleRate = this.context.sampleRate;
-
-      console.log("Initializing WAV");
-
-      recordWavWorker.postMessage({
-        command: 'init',
-        config: {
-          sampleRate: sampleRate
-        }
-      });
 
       console.log("Initializing to Mp3");
 
@@ -78,10 +60,6 @@
     this.stop = function() {
       if (!recording)
         return;
-
-      recordWavWorker.postMessage({
-        command: 'finish'
-      });
 
       encoderMp3Worker.postMessage({
         command: 'finish'
@@ -104,20 +82,6 @@
         case 'mp3':
           var blob = e.data.buf;
           mp3Callback(blob);
-          break;
-      }
-
-    };
-
-    recordWavWorker.onmessage = function(e) {
-      var command = e.data.command;
-
-      console.log('recordWavWorker - onmessage: ' + command);
-
-      switch (command) {
-        case 'wav':
-          var blob = e.data.buf;
-          wavCallback(blob);
           break;
       }
 
