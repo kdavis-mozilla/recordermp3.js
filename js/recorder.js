@@ -9,34 +9,35 @@
     var bufferLen = config.bufferLen || BUFFER_LEN;
     var mp3Callback = config.mp3Callback || MP3_CALLBACK;
 
+    this.source = source;
     this.context = source.context;
 
-    this.node = (this.context.createScriptProcessor || this.context.createJavaScriptNode).call(this.context, bufferLen, 1, 1);
-    this.node.connect(this.context.destination); //this should not be necessary
-
     var encoderMp3Worker = new Worker(config.mp3WorkerPath || MP3_WORKER_PATH);
-
-    this.node.onaudioprocess = function(e) {
-
-      if (!recording)
-        return;
-
-      var channelLeft = e.inputBuffer.getChannelData(0);
-
-      console.log('onAudioProcess' + channelLeft.length);
-
-      encoderMp3Worker.postMessage({
-        command: 'encode',
-        buf: channelLeft
-      });
-
-    }
-
-    source.connect(this.node);
 
     this.record = function() {
       if (recording)
         return false;
+
+      this.node = (this.context.createScriptProcessor || this.context.createJavaScriptNode).call(this.context, bufferLen, 1, 1);
+      this.node.connect(this.context.destination); //this should not be necessary
+
+      this.node.onaudioprocess = function(e) {
+
+        if (!recording)
+          return;
+
+        var channelLeft = e.inputBuffer.getChannelData(0);
+
+        console.log('onAudioProcess' + channelLeft.length);
+
+        encoderMp3Worker.postMessage({
+          command: 'encode',
+          buf: channelLeft
+        });
+
+      }
+
+      this.source.connect(this.node);
 
       recording = true;
 
