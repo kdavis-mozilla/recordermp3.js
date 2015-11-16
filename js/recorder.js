@@ -18,7 +18,7 @@
     this.node.connect(this.context.destination); //this should not be necessary
 
     var recordWavWorker = new Worker(config.wavWorkerPath || WAV_WORKER_PATH);
-    var encoderMp3Worker = new Worker(config.wavWorkerPath || MP3_WORKER_PATH);
+    var encoderMp3Worker = new Worker(config.mp3WorkerPath || MP3_WORKER_PATH);
 
     this.node.onaudioprocess = function(e) {
 
