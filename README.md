@@ -18,8 +18,8 @@ A sample demonstrating how to encode the output of Web Audio API nodes.
 
 ##Author
 
-Wellington Soares well.cco@gmail.com
-Kelly Davis kdavis@mozilla.com
+* Wellington Soares well.cco@gmail.com
+* Kelly Davis kdavis@mozilla.com
 
 
 ##Thanks
