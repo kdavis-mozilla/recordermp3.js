@@ -3,18 +3,15 @@
 # Record/Encode Audio from Browser
 
 
-A sample demonstrating how to encode the output of Web Audio API nodes.
+Javascript code demonstrating how to encode the output of Web Audio API nodes.
 
 
 ### Compatibility - Browser
 * Chrome 32+
-* Others?
+* Firefox 45.0a1+
 
 ### Codecs
 * MP3: 22.050Hz && 128Kbps using the ported liblame
-* Ogg-Vorbis: @TODO
-* Spx: @TODO
-* Flac: @TODO
 
 ##Author
 
