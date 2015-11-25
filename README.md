@@ -3,7 +3,7 @@
 # Record/Encode Audio from Browser
 
 
-Javascript code demonstrating how to encode the output of Web Audio API nodes.
+__recordermp3.js__ is a small Javascript library for mp3 encoding the output of Web Audio API nodes.
 
 
 ### Compatibility - Browser
