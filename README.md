@@ -36,7 +36,7 @@ __recordermp3.js__ is a small Javascript library for mp3 encoding the output of 
     // Setup config
     var config = {
      mp3Callback : mp3Callback,
-     mp3RecorderWorkerPath: 'vendor/recordermp3.js/js/enc/mp3/mp3Worker.js'
+     mp3WorkerPath: 'vendor/recordermp3.js/js/enc/mp3/mp3Worker.js'
     }; 
     
     // Create Recorder
