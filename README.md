@@ -55,6 +55,8 @@ __recordermp3.js__ is a small Javascript library for mp3 encoding the output of 
 </html>
 ```
 
+Recording is started by calling ```recorder.record()``` and stoped by calling ```recorder.stop()```.
+
 To see a fuller example refer to [dictatemp3.js](https://github.com/kdavis-mozilla/dictatemp3.js) in particular [dictate.js](https://github.com/kdavis-mozilla/dictatemp3.js/blob/master/lib/dictate.js).
 
 
