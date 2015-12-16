@@ -21,7 +21,7 @@ __recordermp3.js__ is a small Javascript library for mp3 encoding the output of 
 <script type="text/javascript">
   // Define mp3 callback 
   function mp3Callback(blob) {
-    config.log('Got mp3 blob');
+    console.log('Got mp3 blob');
   }
   
   // Create AudioContext
@@ -41,6 +41,14 @@ __recordermp3.js__ is a small Javascript library for mp3 encoding the output of 
     
     // Create Recorder
     var recorder = new Recorder(source, config);
+
+    // Start recording
+    recorder.record();
+  
+    // Stop recording in 2 seconds
+    setTimeout(function(){
+      recorder.stop();
+    }, 2000);
   }
 
   // Ask for audio device
